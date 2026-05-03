@@ -1,0 +1,839 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Imperial Brindes — Controle de Estoque</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Barlow+Condensed:wght@500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    /* ═══════════════════════════════════════
+       CSS VARIABLES
+    ═══════════════════════════════════════ */
+    :root {
+      --blue:        #2d82bb;
+      --blue-dark:   #1a5c8a;
+      --blue-deeper: #134468;
+      --blue-light:  #e4f2fb;
+      --blue-mid:    #5aaad8;
+      --gold:        #f5bc2f;
+      --gold-dark:   #c9980f;
+      --gold-light:  #fdf5da;
+      --gold-mid:    #f9d06a;
+      --bg:          #eef2f7;
+      --surface:     #ffffff;
+      --surface-2:   #f7f9fc;
+      --border:      #dae2ee;
+      --border-dark: #bfcce0;
+      --text:        #0f1e30;
+      --text-2:      #3d5166;
+      --text-3:      #8496aa;
+      --green:       #22c55e;
+      --green-light: #dcfce7;
+      --red:         #ef4444;
+      --red-light:   #fee2e2;
+      --radius:      14px;
+      --radius-sm:   9px;
+      --radius-pill: 100px;
+      --shadow-xs:   0 1px 2px rgba(15,40,80,.06);
+      --shadow-sm:   0 2px 6px rgba(15,40,80,.08), 0 1px 2px rgba(15,40,80,.04);
+      --shadow-md:   0 6px 20px rgba(15,40,80,.11), 0 2px 6px rgba(15,40,80,.06);
+      --shadow-lg:   0 12px 36px rgba(15,40,80,.14), 0 4px 10px rgba(15,40,80,.07);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* ═══════════════════════════════════════
+       HEADER
+    ═══════════════════════════════════════ */
+    header {
+      background: linear-gradient(135deg, var(--blue-deeper) 0%, var(--blue-dark) 60%, #1f6e9c 100%);
+      border-bottom: 3px solid var(--gold);
+      padding: 0 2rem;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 3px 18px rgba(0,0,0,.22);
+    }
+
+    .header-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 70px;
+      gap: 1.5rem;
+    }
+
+    .logo-text {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      flex-shrink: 0;
+    }
+
+    .logo-text span {
+      color: var(--gold);
+    }
+
+    /* Search */
+    .search-wrap {
+      flex: 1;
+      max-width: 380px;
+      position: relative;
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: rgba(255,255,255,.5);
+      pointer-events: none;
+      display: flex;
+    }
+
+    #searchInput {
+      width: 100%;
+      height: 42px;
+      padding: 0 1.1rem 0 2.7rem;
+      border: 1.5px solid rgba(255,255,255,.18);
+      border-radius: var(--radius-pill);
+      background: rgba(255,255,255,.10);
+      backdrop-filter: blur(6px);
+      font-family: 'Inter', sans-serif;
+      font-size: .875rem;
+      color: #fff;
+      outline: none;
+      transition: border-color .2s, background .2s, box-shadow .2s;
+      letter-spacing: .01em;
+    }
+
+    #searchInput::placeholder { color: rgba(255,255,255,.42); }
+
+    #searchInput:focus {
+      border-color: var(--gold);
+      background: rgba(255,255,255,.16);
+      box-shadow: 0 0 0 3px rgba(245,188,47,.25);
+    }
+
+    /* Total badge */
+    .total-badge {
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+      background: rgba(255,255,255,.12);
+      border: 1px solid rgba(255,255,255,.2);
+      border-radius: var(--radius-pill);
+      padding: 6px 14px 6px 10px;
+      color: #fff;
+      font-size: .78rem;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .total-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--gold);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: .6; transform: scale(.85); }
+    }
+
+    /* ═══════════════════════════════════════
+       HERO BAND
+    ═══════════════════════════════════════ */
+    .hero-band {
+      background: linear-gradient(90deg, var(--blue-dark) 0%, var(--blue) 100%);
+      padding: .65rem 2rem;
+    }
+
+    .hero-band-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    .hero-band p {
+      font-size: .78rem;
+      color: rgba(255,255,255,.65);
+      letter-spacing: .02em;
+    }
+
+    .hero-band strong { color: rgba(255,255,255,.92); font-weight: 600; }
+
+    /* ═══════════════════════════════════════
+       MAIN
+    ═══════════════════════════════════════ */
+    main {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 2.2rem 2rem 5rem;
+    }
+
+    /* Meta bar */
+    .meta-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.4rem;
+    }
+
+    .meta-left {
+      display: flex;
+      align-items: center;
+      gap: .75rem;
+    }
+
+    .meta-title {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 1.35rem;
+      font-weight: 700;
+      letter-spacing: .02em;
+      color: var(--blue-deeper);
+      text-transform: uppercase;
+    }
+
+    .meta-divider {
+      width: 1px;
+      height: 18px;
+      background: var(--border-dark);
+      border-radius: 1px;
+    }
+
+    .meta-sub {
+      font-size: .78rem;
+      color: var(--text-3);
+      font-weight: 400;
+    }
+
+    .counter-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: .4rem;
+      background: var(--surface);
+      color: var(--blue-dark);
+      font-size: .775rem;
+      font-weight: 600;
+      padding: 6px 14px;
+      border-radius: var(--radius-pill);
+      border: 1.5px solid var(--border-dark);
+      box-shadow: var(--shadow-xs);
+      letter-spacing: .01em;
+    }
+
+    .counter-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--gold);
+      flex-shrink: 0;
+    }
+
+    /* ═══════════════════════════════════════
+       GRID
+    ═══════════════════════════════════════ */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+      gap: 12px;
+    }
+
+    /* ═══════════════════════════════════════
+       CARD
+    ═══════════════════════════════════════ */
+    .card {
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1rem 1rem 1rem 1rem;
+      display: flex;
+      align-items: center;
+      gap: .85rem;
+      transition: transform .17s ease, box-shadow .17s ease, border-color .17s ease;
+      animation: fadeUp .3s ease both;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Acento lateral esquerdo */
+    .card::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 3px;
+      background: transparent;
+      border-radius: 3px 0 0 3px;
+      transition: background .17s;
+    }
+
+    .card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+      border-color: #a8ccec;
+    }
+
+    .card:hover::before {
+      background: var(--gold);
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Ícone do card */
+    .card-icon {
+      width: 42px;
+      height: 42px;
+      background: var(--blue-light);
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-size: 1.2rem;
+      transition: background .17s, transform .17s;
+    }
+
+    .card:hover .card-icon {
+      background: #cce2f5;
+      transform: scale(1.06);
+    }
+
+    /* Nome do produto */
+    .card-name {
+      flex: 1;
+      font-size: .84rem;
+      font-weight: 600;
+      color: var(--text);
+      letter-spacing: .015em;
+      line-height: 1.3;
+    }
+
+    /* ═══════════════════════════════════════
+       CONTROLE DE QUANTIDADE
+    ═══════════════════════════════════════ */
+    .qty-control {
+      display: flex;
+      align-items: center;
+      gap: .4rem;
+      flex-shrink: 0;
+    }
+
+    /* Botões + e - */
+    .btn-qty {
+      width: 30px;
+      height: 30px;
+      border: 1.5px solid var(--border-dark);
+      border-radius: 50%;
+      background: var(--surface-2);
+      color: var(--text-2);
+      font-size: 1.05rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all .17s ease;
+      line-height: 1;
+      outline: none;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .btn-qty:hover {
+      border-color: var(--blue);
+      color: var(--blue-dark);
+      background: var(--blue-light);
+      box-shadow: 0 2px 8px rgba(45,130,187,.18);
+    }
+
+    .btn-qty:active {
+      transform: scale(.9);
+    }
+
+    /* Botão diminuir - vermelho suave ao hover */
+    .btn-qty.minus:hover {
+      border-color: var(--red);
+      color: var(--red);
+      background: var(--red-light);
+      box-shadow: 0 2px 8px rgba(239,68,68,.15);
+    }
+
+    /* ═══════════════════════════════════════
+       BOTÃO COPIAR NOME
+    ═══════════════════════════════════════ */
+    .btn-copy {
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      gap: .32rem;
+      height: 30px;
+      padding: 0 10px;
+      border: 1.5px solid var(--border-dark);
+      border-radius: var(--radius-pill);
+      background: var(--surface-2);
+      color: var(--text-3);
+      font-family: 'Inter', sans-serif;
+      font-size: .72rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all .17s ease;
+      white-space: nowrap;
+      outline: none;
+      letter-spacing: .02em;
+    }
+
+    .btn-copy:hover {
+      border-color: var(--blue);
+      color: var(--blue-dark);
+      background: var(--blue-light);
+      box-shadow: 0 2px 8px rgba(45,130,187,.18);
+    }
+
+    .btn-copy:active { transform: scale(.95); }
+
+    .btn-copy.copied {
+      border-color: var(--gold-dark);
+      color: var(--gold-dark);
+      background: var(--gold-light);
+      box-shadow: 0 2px 8px rgba(200,150,10,.14);
+    }
+
+    /* Badge de quantidade */
+    .qty-value {
+      min-width: 42px;
+      height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--blue-deeper);
+      color: #fff;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 1rem;
+      font-weight: 700;
+      border-radius: var(--radius-sm);
+      letter-spacing: .02em;
+      transition: all .2s ease;
+    }
+
+    /* Animação quando o valor muda */
+    .qty-value.changed {
+      animation: qtyPop .25s ease;
+    }
+
+    @keyframes qtyPop {
+      0%   { transform: scale(1); }
+      50%  { transform: scale(1.2); background: var(--gold-dark); }
+      100% { transform: scale(1); }
+    }
+
+    /* Alerta de estoque baixo */
+    .qty-value.low {
+      background: #b45309;
+    }
+
+    .qty-value.zero {
+      background: var(--red);
+    }
+
+    /* ═══════════════════════════════════════
+       EMPTY STATE
+    ═══════════════════════════════════════ */
+    .empty-state {
+      text-align: center;
+      padding: 5rem 2rem;
+      display: none;
+    }
+
+    .empty-state.visible { display: block; }
+
+    .empty-icon-wrap {
+      width: 64px;
+      height: 64px;
+      background: var(--blue-light);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 1.1rem;
+      font-size: 1.7rem;
+    }
+
+    .empty-state h3 {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--blue-dark);
+      letter-spacing: .03em;
+      text-transform: uppercase;
+      margin-bottom: .4rem;
+    }
+
+    .empty-state p { font-size: .84rem; color: var(--text-3); }
+
+    /* ═══════════════════════════════════════
+       TOAST
+    ═══════════════════════════════════════ */
+    #toast {
+      position: fixed;
+      bottom: 1.75rem;
+      left: 50%;
+      transform: translateX(-50%) translateY(16px);
+      background: var(--blue-deeper);
+      color: #fff;
+      font-size: .82rem;
+      font-weight: 500;
+      padding: 11px 22px 11px 18px;
+      border-radius: var(--radius-pill);
+      border-left: 4px solid var(--gold);
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity .22s, transform .22s;
+      z-index: 9999;
+      white-space: nowrap;
+      box-shadow: 0 6px 24px rgba(0,0,0,.22);
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+    }
+
+    #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    .toast-icon {
+      width: 20px; height: 20px;
+      background: var(--gold);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      color: var(--blue-deeper);
+      font-size: .7rem;
+      font-weight: 700;
+    }
+
+    /* ═══════════════════════════════════════
+       FOOTER
+    ═══════════════════════════════════════ */
+    footer {
+      text-align: center;
+      padding: 1.25rem 2rem;
+      font-size: .73rem;
+      color: var(--text-3);
+      border-top: 1px solid var(--border);
+      background: var(--surface);
+      letter-spacing: .02em;
+    }
+
+    footer span { color: var(--blue); font-weight: 600; }
+
+    /* ═══════════════════════════════════════
+       RESPONSIVE
+    ═══════════════════════════════════════ */
+    @media (max-width: 680px) {
+      .header-inner { height: 60px; gap: .75rem; }
+      .logo-text { font-size: 1.1rem; }
+      .hero-band { display: none; }
+      main { padding: 1.5rem 1rem 3rem; }
+      .grid { grid-template-columns: 1fr; gap: 8px; }
+      .meta-title { font-size: 1.1rem; }
+      .meta-sub { display: none; }
+      .meta-divider { display: none; }
+      .total-badge { font-size: .7rem; padding: 5px 10px 5px 8px; }
+    }
+  </style>
+</head>
+
+<body>
+
+<!-- ═══════════════ HEADER ═══════════════ -->
+<header>
+  <div class="header-inner">
+    <div class="logo-text">Imperial <span>Brindes</span></div>
+
+    <div class="search-wrap">
+      <span class="search-icon">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+      </span>
+      <input id="searchInput" type="text" placeholder="Buscar brinde..." autocomplete="off" spellcheck="false" />
+    </div>
+
+    <div class="total-badge">
+      <span class="total-dot"></span>
+      Total: <strong id="totalGeral">0</strong> itens
+    </div>
+  </div>
+</header>
+
+<!-- ═══════════════ HERO BAND ═══════════════ -->
+<div class="hero-band">
+  <div class="hero-band-inner">
+    <p>📦 Controle de estoque em <strong>tempo real</strong> — use <strong>Copiar</strong> para copiar o nome e <strong>−</strong> para dar baixa no estoque</p>
+  </div>
+</div>
+
+<!-- ═══════════════ MAIN ═══════════════ -->
+<main>
+  <div class="meta-bar">
+    <div class="meta-left">
+      <h1 class="meta-title">Produtos</h1>
+      <div class="meta-divider"></div>
+      <span class="meta-sub">Estoque de brindes</span>
+    </div>
+    <div class="counter-badge">
+      <span class="counter-dot"></span>
+      <span id="counter">0 itens</span>
+    </div>
+  </div>
+
+  <div class="grid" id="grid"></div>
+
+  <div class="empty-state" id="emptyState">
+    <div class="empty-icon-wrap">🔍</div>
+    <h3>Nenhum resultado</h3>
+    <p>Tente buscar com um termo diferente.</p>
+  </div>
+</main>
+
+<!-- ═══════════════ FOOTER ═══════════════ -->
+<footer>
+  <span>Imperial Brindes</span> &nbsp;·&nbsp; Controle de Estoque &nbsp;·&nbsp; Uso exclusivo da equipe
+</footer>
+
+<!-- ═══════════════ TOAST ═══════════════ -->
+<div id="toast">
+  <div class="toast-icon">✓</div>
+  <span id="toastMsg"></span>
+</div>
+
+
+<!-- ═══════════════ FIREBASE SDK ═══════════════ -->
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
+<script>
+  /* ════════════════════════════════════════════
+     CONFIGURAÇÃO FIREBASE
+  ════════════════════════════════════════════ */
+  const firebaseConfig = {
+    apiKey: "AIzaSyD2ay2IPwJzRVHAD_2jo-2ICFxtOd5uwBc",
+    authDomain: "brindes-internos.firebaseapp.com",
+    databaseURL: "https://brindes-internos-default-rtdb.firebaseio.com",
+    projectId: "brindes-internos",
+    storageBucket: "brindes-internos.firebasestorage.app",
+    messagingSenderId: "337581361680",
+    appId: "1:337581361680:web:e32b607a0d8d9fc2771895"
+  };
+
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
+
+  /* ════════════════════════════════════════════
+     LISTA DE PRODUTOS
+     (emoji + nome + quantidade inicial)
+  ════════════════════════════════════════════ */
+  const PRODUTOS = [
+    { id: "p1",  nome: "KIT FERRAMENTA 5 PEÇAS",       emoji: "🔧", qtd: 2  },
+    { id: "p2",  nome: "KIT FERRAMENTA 3 PEÇAS",       emoji: "🔧", qtd: 11 },
+    { id: "p3",  nome: "KIT CADERNO",                  emoji: "📒", qtd: 7  },
+    { id: "p4",  nome: "ABRIDOR DE VINHO",             emoji: "🍷", qtd: 8  },
+    { id: "p5",  nome: "GARRAFA INOX",                 emoji: "🥤", qtd: 30 },
+    { id: "p6",  nome: "CANETA METÁLICA",              emoji: "🖊️", qtd: 250},
+    { id: "p7",  nome: "CHAVEIRO PÉ DE GALINHA",       emoji: "🐾", qtd: 100},
+    { id: "p8",  nome: "LANTERNINHA",                  emoji: "🔦", qtd: 19 },
+    { id: "p9",  nome: "FONE COM FIO",                 emoji: "🎧", qtd: 5  },
+    { id: "p10", nome: "FONE SEM FIO",                 emoji: "🎧", qtd: 2  },
+    { id: "p11", nome: "HEADSET",                      emoji: "🎙️", qtd: 4  },
+    { id: "p12", nome: "SUPORTE CELULAR CARRO",        emoji: "📱", qtd: 34 },
+    { id: "p13", nome: "SACOCHILA",                    emoji: "🎒", qtd: 23 },
+    { id: "p14", nome: "BOLSA TÉRMICA",                emoji: "🧳", qtd: 50 },
+    { id: "p15", nome: "LIXOCAR",                      emoji: "🗑️", qtd: 4  },
+    { id: "p16", nome: "CHAVEIRO",                     emoji: "🗝️", qtd: 18 },
+    { id: "p17", nome: "GARRAFA PLÁSTICO",             emoji: "💧", qtd: 15 }
+  ];
+
+  /* ════════════════════════════════════════════
+     REFERENCIAS DOM
+  ════════════════════════════════════════════ */
+  const grid        = document.getElementById('grid');
+  const searchInput = document.getElementById('searchInput');
+  const counter     = document.getElementById('counter');
+  const emptyState  = document.getElementById('emptyState');
+  const toast       = document.getElementById('toast');
+  const toastMsg    = document.getElementById('toastMsg');
+  const totalGeral  = document.getElementById('totalGeral');
+
+  let toastTimer = null;
+
+  /* ════════════════════════════════════════════
+     TOAST
+  ════════════════════════════════════════════ */
+  function showToast(msg) {
+    toastMsg.textContent = msg;
+    toast.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toast.classList.remove('show'), 2600);
+  }
+
+  /* ════════════════════════════════════════════
+     RENDERIZAÇÃO DOS CARDS
+  ════════════════════════════════════════════ */
+  let visibleIds = PRODUTOS.map(p => p.id); // IDs visíveis após filtro
+
+  function renderCards(query = '') {
+    const q = query.trim().toLowerCase();
+    const lista = q
+      ? PRODUTOS.filter(p => p.nome.toLowerCase().includes(q))
+      : PRODUTOS;
+
+    visibleIds = lista.map(p => p.id);
+    grid.innerHTML = '';
+
+    lista.forEach((p, i) => {
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.style.animationDelay = `${i * 0.036}s`;
+      card.dataset.id = p.id;
+
+      card.innerHTML = `
+        <div class="card-icon">${p.emoji}</div>
+        <span class="card-name">${p.nome}</span>
+        <div class="qty-control">
+          <button class="btn-qty minus" title="Dar baixa no estoque" onclick="alterar('${p.id}', -1)">−</button>
+          <div class="qty-value" id="qty-${p.id}">—</div>
+          <button class="btn-copy" title="Copiar nome do produto" onclick="copiarNome('${p.nome}', this)">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            <span class="btn-label">Copiar</span>
+          </button>
+        </div>
+      `;
+
+      grid.appendChild(card);
+    });
+
+    // Contador de cards
+    const n = lista.length;
+    counter.textContent = `${n} ${n === 1 ? 'item' : 'itens'}`;
+    emptyState.classList.toggle('visible', n === 0);
+  }
+
+  /* ════════════════════════════════════════════
+     ATUALIZAR QUANTIDADE NO CARD
+  ════════════════════════════════════════════ */
+  function atualizarQtyDisplay(id, valor) {
+    const el = document.getElementById(`qty-${id}`);
+    if (!el) return;
+
+    el.textContent = valor;
+
+    // Cores de alerta
+    el.classList.remove('low', 'zero');
+    if (valor === 0) el.classList.add('zero');
+    else if (valor <= 3) el.classList.add('low');
+
+    // Animação pop ao mudar
+    el.classList.remove('changed');
+    void el.offsetWidth; // reflow para reiniciar animação
+    el.classList.add('changed');
+  }
+
+  /* ════════════════════════════════════════════
+     CALCULAR E EXIBIR TOTAL GERAL
+  ════════════════════════════════════════════ */
+  function calcularTotal() {
+    db.ref("produtos").once("value", snap => {
+      let total = 0;
+      snap.forEach(item => { total += (item.val() || 0); });
+      totalGeral.textContent = total;
+    });
+  }
+
+  /* ════════════════════════════════════════════
+     ALTERAR QUANTIDADE NO FIREBASE
+  ════════════════════════════════════════════ */
+  function alterar(id, delta) {
+    const ref = db.ref("produtos/" + id);
+    ref.transaction(atual => {
+      if (atual === null) return delta > 0 ? delta : 0;
+      const novo = atual + delta;
+      return novo < 0 ? 0 : novo;
+    });
+  }
+
+  /* ════════════════════════════════════════════
+     INICIALIZAÇÃO: CRIAR/OBSERVAR CADA PRODUTO
+  ════════════════════════════════════════════ */
+  PRODUTOS.forEach(p => {
+    const ref = db.ref("produtos/" + p.id);
+
+    // Criar no Firebase se não existir
+    ref.once("value", snap => {
+      if (snap.val() === null) {
+        ref.set(p.qtd);
+      }
+    });
+
+    // Listener tempo real
+    ref.on("value", snap => {
+      const val = snap.val() !== null ? snap.val() : 0;
+      atualizarQtyDisplay(p.id, val);
+      calcularTotal();
+    });
+  });
+
+  /* ════════════════════════════════════════════
+     COPIAR NOME DO PRODUTO
+  ════════════════════════════════════════════ */
+  const checkSVG = `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`;
+  const copySVG  = `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>`;
+
+  function copiarNome(nome, btn) {
+    navigator.clipboard.writeText(nome).then(() => {
+      btn.querySelector('svg').outerHTML; // substituído abaixo
+      btn.innerHTML = checkSVG + '<span class="btn-label">Copiado!</span>';
+      btn.classList.add('copied');
+      showToast(nome + ' copiado!');
+      setTimeout(() => {
+        btn.innerHTML = copySVG + '<span class="btn-label">Copiar</span>';
+        btn.classList.remove('copied');
+      }, 1600);
+    });
+  }
+
+  /* ════════════════════════════════════════════
+     BUSCA
+  ════════════════════════════════════════════ */
+  searchInput.addEventListener('input', e => renderCards(e.target.value));
+
+  /* ════════════════════════════════════════════
+     RENDER INICIAL
+  ════════════════════════════════════════════ */
+  renderCards();
+</script>
+
+</body>
+</html>
